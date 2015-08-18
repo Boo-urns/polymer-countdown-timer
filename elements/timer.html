@@ -1,4 +1,4 @@
-<dom-module id="proto-timer">
+<dom-module id="countdown-timer">
   <link href="../bower_components/polymer/polymer.html" rel="import">
 
   <template>
@@ -36,7 +36,7 @@
       start: function() {
         console.log('start timer');
       },
-      stop: function() {
+      stop: function(e) {
         clearInterval(this.get('interval'));
       },
       // add a callback to the element's prototype
@@ -45,5 +45,5 @@
       }
     });
   </script>
-  
+
 </dom-module>
