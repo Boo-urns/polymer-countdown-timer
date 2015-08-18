@@ -1,0 +1,47 @@
+<dom-module id="proto-timer">
+  <link href="../bower_components/polymer/polymer.html" rel="import">
+
+  <template>
+    <div>
+      <h2><span>{{timer}}</span> min Timer</h2>
+      <span>{{timestamp}}</span>
+    </div>
+    <button id="start">Start Timer</button>
+    <button id="stop">Stop Timer</button>
+  </template>
+  <script>
+    // register a new element called countdown-timer
+    Polymer({
+      is: "countdown-timer",  // is = element name and always needs a hyphen
+      properties: {
+        timestamp: {      // starting timestamp
+          type: Number,
+          value: 0
+        },
+        timer: {    // timer in minutes
+          type: Number,
+          value: 60
+        }
+      },
+      listeners: {        // more info https://www.polymer-project.org/1.0/docs/devguide/events.html
+         'start.tap': 'initStart',
+         'stop.tap': 'stop'
+      },
+      initStart: function(e) {
+        var date = new Date();
+        var timerEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes() + this.get('timer'));
+        this.set('interval', setInterval(this.start, 1000));
+      },
+      start: function() {
+        console.log('start timer');
+      },
+      stop: function() {
+        clearInterval(this.get('interval'));
+      },
+      // add a callback to the element's prototype
+      ready: function() {
+        this.set('timestamp', Date.now());
+      }
+    });
+  </script>
+</dom-module>
