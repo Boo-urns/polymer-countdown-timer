@@ -3,47 +3,95 @@
 
   <template>
     <div>
-      <h2><span>{{timer}}</span> min Timer</h2>
-      <span>{{timestamp}}</span>
+      <h2><span>{{timer.min}}</span>:<span>{{timer.seconds}}</h2>
     </div>
     <button id="start">Start Timer</button>
     <button id="stop">Stop Timer</button>
   </template>
 
   <script>
-    // register a new element called countdown-timer
+
     Polymer({
-      is: "countdown-timer",  // is = element name and always needs a hyphen
+      is: "countdown-timer",  // is = registering a custom element and always needs a hyphen
+
       properties: {
         timestamp: {      // starting timestamp
-          type: Number,
-          value: 0
+          type: Object,
+          notify: true,
+          value: function() { return { start: 0, end: 0 }; }
         },
         timer: {    // timer in minutes
-          type: Number,
-          value: 60
-        }
+          type: Object,
+          notify: true,
+          value: function() { return { min: 60, seconds: 0 }; }
+        },
+        minutes: Number,
+        seconds: Number
       },
+
       listeners: {        // more info https://www.polymer-project.org/1.0/docs/devguide/events.html
          'start.tap': 'initStart',
          'stop.tap': 'stop'
       },
+
+
       initStart: function(e) {
         var date = new Date();
-        var timerEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes() + this.get('timer'));
-        this.set('interval', setInterval(this.start, 1000));
+
+        // Set the timer
+        this.set('timer.min', this.timer.min);
+        this.set('timer.seconds', this.timer.seconds);
+
+        // Set Starting timestamp
+        this.set('timestamp.start', Date.now());
+        console.log(this.timestamp.start);
+        var timerEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes() + this.timer.min);
+
+        // Set the Interval
+        this.set('interval', setInterval(this.start.bind(this), 1000));
       },
+
       start: function() {
-        console.log('start timer');
+        var initSeconds = this.timer.seconds;
+        this.timer.seconds = (this.timer.seconds-- <= 0) ? 59 : this.timer.seconds--;
+
+        if(this.timer.seconds < 10) {
+          this.timer.seconds = '0' + this.timer.seconds;
+        }
+
+        this.notifyPath('timer.seconds', this.timer.seconds);
+
+        if(parseInt(initSeconds) == 0) {
+          this.notifyPath('timer.min', this.timer.min-1);
+        }
+
+        if(this.timer.min == 0 && this.timer.seconds == 0) {
+          this.stop();
+        }
       },
+
       stop: function(e) {
+        console.log('stop');
         clearInterval(this.get('interval'));
       },
+
       // add a callback to the element's prototype
       ready: function() {
-        this.set('timestamp', Date.now());
+        
+        if(!isNaN(this.minutes)) {
+          this.set('timer.min', this.minutes);
+        }
+
+        this.timer.seconds = (this.seconds >= 0) ? this.seconds : 0;
+        console.log(this.timer.seconds);
+        if(this.timer.seconds < 10) {
+          this.timer.seconds = '0' + this.timer.seconds;
+        }
+
+        this.set('timer.seconds', this.timer.seconds);
       }
     });
+
   </script>
 
 </dom-module>
