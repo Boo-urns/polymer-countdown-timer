@@ -10,6 +10,7 @@
   </template>
 
   <script>
+    var secondFlag = false; // flag to keep track if minutes was decremented.
 
     Polymer({
       is: "countdown-timer",  // is = registering a custom element and always needs a hyphen
@@ -40,29 +41,47 @@
 
         // Set the timer
         this.set('timer.min', this.timer.min);
+        this.set('timer.totalMin', this.timer.min);
         this.set('timer.seconds', this.timer.seconds);
 
         // Set Starting timestamp
         this.set('timestamp.start', Date.now());
-        console.log(this.timestamp.start);
+
         var timerEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes() + this.timer.min);
 
         // Set the Interval
-        this.set('interval', setInterval(this.start.bind(this), 1000));
+        this.set('interval', setInterval(this.start.bind(this), 250));
       },
 
       start: function() {
-        var initSeconds = this.timer.seconds;
-        this.timer.seconds = (this.timer.seconds-- <= 0) ? 59 : this.timer.seconds--;
+        var currentTimestamp = Date.now();
+        var timePassed = Math.floor((currentTimestamp - this.timestamp.start)/1000);
 
-        if(this.timer.seconds < 10) {
-          this.timer.seconds = '0' + this.timer.seconds;
+        var totalTime = this.timer.totalMin * 60000; // 60 min timer as reference to milliseconds
+        var timeRemaining = totalTime - (currentTimestamp - this.timestamp.start);
+
+        var secondsPast = Math.floor(((this.timer.totalMin * 60 - (timeRemaining / 1000 ) / 60) % 1) * 60);
+
+        secondsPast = 60 - secondsPast;
+
+        if(secondsPast == 60) {
+          secondsPast = 0;
         }
 
-        this.notifyPath('timer.seconds', this.timer.seconds);
+        if(secondsPast < 10) {
+          secondsPast = '0' + secondsPast;
+        }
 
-        if(parseInt(initSeconds) == 0) {
-          this.notifyPath('timer.min', this.timer.min-1);
+        // current seconds for display
+        this.set('timer.seconds', secondsPast);
+
+        if(Math.floor(secondsPast) === 59 && secondFlag === false) {
+          secondFlag = true;
+          this.set('timer.min', this.timer.min-1);
+        }
+
+        if(Math.floor(secondsPast) < 59 && secondFlag == true) {
+          secondFlag = false;
         }
 
         if(this.timer.min == 0 && this.timer.seconds == 0) {
@@ -77,13 +96,13 @@
 
       // add a callback to the element's prototype
       ready: function() {
-        
+
         if(!isNaN(this.minutes)) {
           this.set('timer.min', this.minutes);
         }
 
         this.timer.seconds = (this.seconds >= 0) ? this.seconds : 0;
-        console.log(this.timer.seconds);
+
         if(this.timer.seconds < 10) {
           this.timer.seconds = '0' + this.timer.seconds;
         }
