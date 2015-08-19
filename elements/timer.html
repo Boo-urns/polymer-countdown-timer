@@ -75,12 +75,12 @@
         // current seconds for display
         this.set('timer.seconds', secondsPast);
 
-        if(Math.floor(secondsPast) === 59 && secondFlag === false) {
+        if(secondsPast === 59 && secondFlag === false) {
           secondFlag = true;
           this.set('timer.min', this.timer.min-1);
         }
 
-        if(Math.floor(secondsPast) < 59 && secondFlag == true) {
+        if(secondsPast < 59 && secondFlag == true) {
           secondFlag = false;
         }
 
