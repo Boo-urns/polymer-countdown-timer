@@ -1,15 +1,19 @@
 {
-  "name": "timer",
-  "version": "0.0.0",
+  "name": "countdown-timer",
+  "version": "0.1.0",
   "authors": [
-    "Boo-urns <coreyb@simantel.com>"
+    "Boo-urns <coreyaburns@gmail.com>"
   ],
-  "description": "Attempting to setup a timer",
+  "description": "A web component custom element for a countdown timer",
   "main": "index.html",
   "keywords": [
-    "timer"
+    "Polymer",
+    "web-components",
+    "countdown",
+    "countdown timer"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/Boo-urns/polymer-countdown-timer",
   "ignore": [
     "**/.*",
     "node_modules",
