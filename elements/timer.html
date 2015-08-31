@@ -1,16 +1,32 @@
 <dom-module id="countdown-timer">
   <link href="../bower_components/polymer/polymer.html" rel="import">
-
+  <link href="../bower_components/paper-item/paper-item.html" rel="import">
+  <link href="../bower_components/paper-button/paper-button.html" rel="import">
+  <link href="../bower_components/paper-icon-button/paper-icon-button.html" rel="import">
+  <link href="../bower_components/iron-icons/iron-icons.html"  rel="import">
+  <link href="../bower_components/iron-icons/av-icons.html" rel="import">
+  <style>
+    :host {
+      display: block;
+    }
+    paper-item {
+      flex-direction: column;
+      -ms-align-items: center;
+      align-items: center;
+    }
+  </style>
   <template>
-    <div>
+    <paper-item>
       <h2><span>{{timer.min}}</span>:<span>{{timer.seconds}}</h2>
-    </div>
-    <button id="start">Start Timer</button>
-    <button id="stop">Stop Timer</button>
+      <div class="buttons">
+        <paper-icon-button icon="av:play-arrow" id="start"></paper-icon-button>
+        <paper-icon-button icon="av:pause" id="stop"></paper-icon-button>
+      </div>
+    </paper-item>
+
   </template>
 
   <script>
-    var secondFlag = false; // flag to keep track if minutes was decremented.
 
     Polymer({
       is: "countdown-timer",  // is = registering a custom element and always needs a hyphen
@@ -27,7 +43,11 @@
           value: function() { return { min: 60, seconds: 0 }; }
         },
         minutes: Number,
-        seconds: Number
+        seconds: Number,
+        secondFlag: {
+          type: Boolean,
+          value: false
+        }
       },
 
       listeners: {        // more info https://www.polymer-project.org/1.0/docs/devguide/events.html
@@ -40,14 +60,16 @@
         var date = new Date();
 
         // Set the timer
-        this.set('timer.min', this.timer.min);
+        this.set('timer.min', this.get('timer.min'));
+        this.set('timer.seconds', this.get('timer.seconds'));
         this.set('timer.totalMin', this.timer.min);
-        this.set('timer.seconds', this.timer.seconds);
 
+        var totalTime = (this.timer.totalMin * 60000) + (this.get('timer.seconds') * 1000); // 60 min timer as reference to milliseconds
+        this.set('timer.totalTime', totalTime);
+
+        console.log(this.timer.min, this.timer.seconds);
         // Set Starting timestamp
         this.set('timestamp.start', Date.now());
-
-        var timerEnd = new Date(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes() + this.timer.min);
 
         // Set the Interval
         this.set('interval', setInterval(this.start.bind(this), 250));
@@ -57,8 +79,7 @@
         var currentTimestamp = Date.now();
         var timePassed = Math.floor((currentTimestamp - this.timestamp.start)/1000);
 
-        var totalTime = this.timer.totalMin * 60000; // 60 min timer as reference to milliseconds
-        var timeRemaining = totalTime - (currentTimestamp - this.timestamp.start);
+        var timeRemaining = this.timer.totalTime - (currentTimestamp - this.timestamp.start);
 
         var secondsPast = Math.floor(((this.timer.totalMin * 60 - (timeRemaining / 1000 ) / 60) % 1) * 60);
 
@@ -75,13 +96,13 @@
         // current seconds for display
         this.set('timer.seconds', secondsPast);
 
-        if(secondsPast === 59 && secondFlag === false) {
-          secondFlag = true;
+        if(secondsPast === 59 && this.secondFlag == false) {
+          this.secondFlag = true;
           this.set('timer.min', this.timer.min-1);
         }
 
-        if(secondsPast < 59 && secondFlag == true) {
-          secondFlag = false;
+        if(secondsPast < 59 && this.secondFlag == true) {
+          this.secondFlag = false;
         }
 
         if(this.timer.min == 0 && this.timer.seconds == 0) {
@@ -108,7 +129,9 @@
         }
 
         this.set('timer.seconds', this.timer.seconds);
-      }
+
+      },
+
     });
 
   </script>
