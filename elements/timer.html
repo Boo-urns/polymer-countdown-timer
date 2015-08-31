@@ -42,8 +42,8 @@
           notify: true,
           value: function() { return { min: 60, seconds: 0 }; }
         },
-        minutes: Number,
-        seconds: Number,
+        minutes: Number,        // element attribute <countdown-timer minutes="55"></countdown-timer>
+        seconds: Number,        // element attribute <countdown-timer seconds="30"></countdown-timer>
         secondFlag: {
           type: Boolean,
           value: false
@@ -67,7 +67,6 @@
         var totalTime = (this.timer.totalMin * 60000) + (this.get('timer.seconds') * 1000); // 60 min timer as reference to milliseconds
         this.set('timer.totalTime', totalTime);
 
-        console.log(this.timer.min, this.timer.seconds);
         // Set Starting timestamp
         this.set('timestamp.start', Date.now());
 
@@ -85,7 +84,7 @@
 
         secondsPast = 60 - secondsPast;
 
-        if(secondsPast == 60) {
+        if(secondsPast === 60) {
           secondsPast = 0;
         }
 
@@ -96,22 +95,21 @@
         // current seconds for display
         this.set('timer.seconds', secondsPast);
 
-        if(secondsPast === 59 && this.secondFlag == false) {
+        if(secondsPast === 59 && this.secondFlag === false) {
           this.secondFlag = true;
           this.set('timer.min', this.timer.min-1);
         }
 
-        if(secondsPast < 59 && this.secondFlag == true) {
+        if(secondsPast < 59 && this.secondFlag === true) {
           this.secondFlag = false;
         }
 
-        if(this.timer.min == 0 && this.timer.seconds == 0) {
+        if(this.timer.min === 0 && this.timer.seconds === 0) {
           this.stop();
         }
       },
 
       stop: function(e) {
-        console.log('stop');
         clearInterval(this.get('interval'));
       },
 
