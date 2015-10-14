@@ -1,0 +1,137 @@
+<dom-module id="countdown-timer">
+  <link href="../bower_components/polymer/polymer.html" rel="import">
+  <link href="../bower_components/paper-item/paper-item.html" rel="import">
+  <link href="../bower_components/paper-button/paper-button.html" rel="import">
+  <link href="../bower_components/paper-icon-button/paper-icon-button.html" rel="import">
+  <link href="../bower_components/iron-icons/iron-icons.html"  rel="import">
+  <link href="../bower_components/iron-icons/av-icons.html" rel="import">
+  <style>
+    :host {
+      display: block;
+    }
+    paper-item {
+      flex-direction: column;
+      -ms-align-items: center;
+      align-items: center;
+    }
+  </style>
+  <template>
+    <paper-item>
+      <h2><span>{{timer.min}}</span>:<span>{{timer.seconds}}</h2>
+      <div class="buttons">
+        <paper-icon-button icon="av:play-arrow" id="start"></paper-icon-button>
+        <paper-icon-button icon="av:pause" id="stop"></paper-icon-button>
+      </div>
+    </paper-item>
+
+  </template>
+
+  <script>
+
+    Polymer({
+      is: "countdown-timer",  // is = registering a custom element and always needs a hyphen
+
+      properties: {
+        timestamp: {      // starting timestamp
+          type: Object,
+          notify: true,
+          value: function() { return { start: 0, end: 0 }; }
+        },
+        timer: {    // timer in minutes
+          type: Object,
+          notify: true,
+          value: function() { return { min: 60, seconds: 0 }; }
+        },
+        minutes: Number,        // element attribute <countdown-timer minutes="55"></countdown-timer>
+        seconds: Number,        // element attribute <countdown-timer seconds="30"></countdown-timer>
+        secondFlag: {
+          type: Boolean,
+          value: false
+        }
+      },
+
+      listeners: {        // more info https://www.polymer-project.org/1.0/docs/devguide/events.html
+         'start.tap': 'initStart',
+         'stop.tap': 'stop'
+      },
+
+
+      initStart: function(e) {
+        var date = new Date();
+
+        // Set the timer
+        this.set('timer.min', this.get('timer.min'));
+        this.set('timer.seconds', this.get('timer.seconds'));
+        this.set('timer.totalMin', this.timer.min);
+
+        var totalTime = (this.timer.totalMin * 60000) + (this.get('timer.seconds') * 1000); // 60 min timer as reference to milliseconds
+        this.set('timer.totalTime', totalTime);
+
+        // Set Starting timestamp
+        this.set('timestamp.start', Date.now());
+
+        // Set the Interval
+        this.set('interval', setInterval(this.start.bind(this), 250));
+      },
+
+      start: function() {
+        var currentTimestamp = Date.now();
+        var timePassed = Math.floor((currentTimestamp - this.timestamp.start)/1000);
+
+        var timeRemaining = this.timer.totalTime - (currentTimestamp - this.timestamp.start);
+
+        var secondsPast = Math.floor(((this.timer.totalMin * 60 - (timeRemaining / 1000 ) / 60) % 1) * 60);
+
+        secondsPast = 60 - secondsPast;
+
+        if(secondsPast === 60) {
+          secondsPast = 0;
+        }
+
+        if(secondsPast < 10) {
+          secondsPast = '0' + secondsPast;
+        }
+
+        // current seconds for display
+        this.set('timer.seconds', secondsPast);
+
+        if(secondsPast === 59 && this.secondFlag === false) {
+          this.secondFlag = true;
+          this.set('timer.min', this.timer.min-1);
+        }
+
+        if(secondsPast < 59 && this.secondFlag === true) {
+          this.secondFlag = false;
+        }
+
+        if(this.timer.min === 0 && this.timer.seconds === 0) {
+          this.stop();
+        }
+      },
+
+      stop: function(e) {
+        clearInterval(this.get('interval'));
+      },
+
+      // add a callback to the element's prototype
+      ready: function() {
+
+        if(!isNaN(this.minutes)) {
+          this.set('timer.min', this.minutes);
+        }
+
+        this.timer.seconds = (this.seconds >= 0) ? this.seconds : 0;
+
+        if(this.timer.seconds < 10) {
+          this.timer.seconds = '0' + this.timer.seconds;
+        }
+
+        this.set('timer.seconds', this.timer.seconds);
+
+      },
+
+    });
+
+  </script>
+
+</dom-module>
