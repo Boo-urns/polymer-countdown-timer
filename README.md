@@ -6,4 +6,5 @@ Confirms seconds past checking timestamps and not interval alone.
 ##Bower install
 ```bower install countdown-timer```
 
+##Usage
 ```<countdown-timer minutes="55" seconds="30"></countdown-timer>```
